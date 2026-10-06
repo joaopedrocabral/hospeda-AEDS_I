@@ -1,4 +1,4 @@
-# 🏨 Hospeda - Sistema de Gerenciamento de Hotel
+# 🏨 Hospeda Sistema de Gerenciamento de Hotel
 
 Projeto desenvolvido em **C** com o objetivo de aplicar conhecimentos de **Algoritmos e Estruturas de Dados I (AEDS I)**, utilizando como contexto o gerenciamento de um hotel.
 
