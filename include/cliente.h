@@ -1,27 +1,29 @@
 typedef struct {
     int id;
     char nome[100];
-    char cpf[14];
+    char cpf[20];
     char telefone[20];
 } Cliente;
 
-void inserirCliente();
+int inserirCliente(Cliente *listaClientes, int *qtdClientes, int idCliente, char nome[], char cpf[], char telefone[]);
 
-void removerCliente();
+int removerCliente(Cliente *listaClientes, int *qtdClientes, int idCliente);
 
-Cliente* buscarClienteId();
+int buscarClienteId(Cliente *listaClientes, int qtdClientes, int idCliente);
 
-Cliente* buscarClienteCpf();
+int buscarClienteCpf(Cliente *listaClientes, int qtdClientes, char cpf[]);
 
-Cliente* buscarClienteNome();
+int buscarClienteNome(Cliente *listaClientes, int qtdClientes, char nome[]);
 
-void listarClientes();
+void listarClientes(Cliente *listaClientes, int qtdClientes);
 
-int validarNome();
-void formatarNome();
+int validarNome(char nome[]);
+void formatarNome(char nome[], char *nomeFormatado);
 
-void validarCpf();
-void formatarCpf();
+int validarCpf(char cpf[]);
+void formatarCpf(char cpf[], char *cpfFormatado);
 
-void validarTelefone();
-void formatarTelefone();
+int validarTelefone(char telefone[]);
+void formatarTelefone(char telefone[], char *telefoneFormatado);
+
+void imprimirDados(Cliente *cliente);

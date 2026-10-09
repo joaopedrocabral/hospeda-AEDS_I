@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdio.h>
 #include <ctype.h>
 #include "../include/cliente.h"
 
@@ -7,7 +8,7 @@ int validarNome(char nome[]){
 
     for(int i = 0; nome[i] != '\0'; i++){
 
-        if(isalpha(nome[i])){
+        if(isalpha((unsigned char)nome[i])){
 
             contemLetras = 1;
         
@@ -45,7 +46,7 @@ int validarCpf(char cpf[]){
 
     for(int i = 0; cpf[i] != '\0'; i++){
 
-        if(isdigit(cpf[i])){
+        if(isdigit((unsigned char)cpf[i])){
 
             qtdDigitos++;
 
@@ -80,7 +81,7 @@ int validarTelefone(char telefone[]){
 
     for(int i = 0; telefone[i] != '\0'; i++){
 
-        if(isdigit(telefone[i])){
+        if(isdigit((unsigned char)telefone[i])){
 
             qtdDigitos++;
 
@@ -109,7 +110,22 @@ void formatarTelefone(char telefone[], char *telefoneFormatado){
     telefoneFormatado[j] = '\0';
 }
 
-int inserirCliente(int *qtdClientes, Cliente *listaClientes, int id, char nome[], char cpf[], char telefone[]){
+void imprimirDados(Cliente *cliente){
+    printf("ID: %d\n", cliente->id);
+    printf("Nome: %s\n", cliente->nome);
+
+    printf("CPF: %.3s.%.3s.%.3s-%.2s\n", cliente->cpf, cliente->cpf+3, cliente->cpf+6, cliente->cpf+9);
+
+    if(strlen(cliente->telefone) == 11){
+        printf("Telefone: (%.2s) %.5s-%.4s\n", cliente->telefone, cliente->telefone+2, cliente->telefone+7);
+
+    } else {
+        printf("Telefone: (%.2s) %.4s-%.4s\n", cliente->telefone, cliente->telefone+2, cliente->telefone+6);
+    }
+
+}
+
+int inserirCliente(Cliente *listaClientes, int *qtdClientes, int idCliente, char nome[], char cpf[], char telefone[]){
     Cliente novoCliente;
 
     if(!validarNome(nome)){
@@ -133,18 +149,18 @@ int inserirCliente(int *qtdClientes, Cliente *listaClientes, int id, char nome[]
 
     }
 
-    novoCliente.id = id;
+    novoCliente.id = idCliente;
 
     char nomeFormatado[100];
-    formatarNome(nome, &nomeFormatado);
+    formatarNome(nome, nomeFormatado);
     strcpy(novoCliente.nome, nomeFormatado);
 
     char cpfFormatado[20];
-    formatarCpf(cpf, &cpfFormatado);
+    formatarCpf(cpf, cpfFormatado);
     strcpy(novoCliente.cpf, cpfFormatado);
 
     char telefoneFormatado[20];
-    formatarTelefone(telefone, &telefoneFormatado);
+    formatarTelefone(telefone, telefoneFormatado);
     strcpy(novoCliente.telefone, telefoneFormatado);
 
     listaClientes[*qtdClientes] = novoCliente;
@@ -152,4 +168,73 @@ int inserirCliente(int *qtdClientes, Cliente *listaClientes, int id, char nome[]
     (*qtdClientes)++;
 
     return 1;
+}
+
+int removerCliente(Cliente *listaClientes, int *qtdClientes, int idCliente){
+
+    int indiceCliente = buscarClienteId(listaClientes, *qtdClientes, idCliente);
+
+    if(indiceCliente == -1){
+        return 0;
+    }
+
+    for(int i = indiceCliente; i < *qtdClientes - 1; i++){
+
+        listaClientes[i] = listaClientes[i + 1];
+    }
+
+    (*qtdClientes)--;
+
+    return 1;
+}
+
+int buscarClienteId(Cliente *listaClientes, int qtdClientes, int idCliente){
+    
+    for(int i = 0; i < qtdClientes; i++){
+        
+        if(listaClientes[i].id == idCliente){
+            return i;
+        }
+    }
+
+    printf("ERRO! Cliente não encontrado!\n");
+
+    return -1;
+};
+
+int buscarClienteCpf(Cliente *listaClientes, int qtdClientes, char cpf[]){
+    
+    for(int i = 0; i < qtdClientes; i++){
+        
+        if((strcmp(listaClientes[i].cpf, cpf)) == 0){
+            return i;
+        }
+    }
+
+    printf("ERRO! Cliente não encontrado!\n");
+    return -1;
+};
+
+int buscarClienteNome(Cliente *listaClientes, int qtdClientes, char nome[]){
+    
+    for(int i = 0; i < qtdClientes; i++){
+        
+        if((strcmp(listaClientes[i].nome, nome)) == 0){
+            return i;
+        }
+    }
+
+    printf("ERRO! Cliente não encontrado!\n");
+
+    return -1;
+};
+
+void listarClientes(Cliente *listaClientes, int qtdClientes){
+
+    for(int i = 0; i < qtdClientes; i++){
+
+        imprimirDados(&listaClientes[i]);
+
+        printf("\n-------------------------------\n");
+    }
 }
