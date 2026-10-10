@@ -45,7 +45,7 @@ int inserirQuartos(Quarto *listaQuarto, int Numero, TipoQuarto Tipo, int Capacid
     listaQuarto[qtdQuartos].Status == DISPONIVEL; //Adiciona as carecteriscas do quarto e mantem o status inicial como DISPONIVEL
 
     return 1;
-};
+}
 
 int removerQuartos(Quarto *listaQuarto, int Numero, StatusQuarto Status){
     
@@ -65,7 +65,7 @@ int removerQuartos(Quarto *listaQuarto, int Numero, StatusQuarto Status){
     printf("Quarto %d não encontrado.\n", Numero);//Retorna um aviso caso o quarto do numero indicado não exista.
     return 0;
 
-};
+}
 
 int buscarQuartoNumero(Quarto *listaQuarto, int Numero){
     for (int i = 0; i < qtdQuartos; i++){
@@ -79,7 +79,7 @@ int buscarQuartoNumero(Quarto *listaQuarto, int Numero){
         printf("Quarto %d não encontrado.\n", Numero);
         return -1;
     }
-};//Busca o quarto imprime as suas informações e caso não tenha um quarto referente ao numero irá retornar uma mensagem de aviso.
+}//Busca o quarto imprime as suas informações e caso não tenha um quarto referente ao numero irá retornar uma mensagem de aviso.
 
 void listarQuarto(Quarto *listaQuarto, StatusQuarto Status){
     for (int i = 0; i < qtdQuartos; i++){
@@ -89,5 +89,5 @@ void listarQuarto(Quarto *listaQuarto, StatusQuarto Status){
         
     }
 
-};// Lista todos os quartos ou pelo seu status.sss
+}// Lista todos os quartos ou pelo seu status.
 
