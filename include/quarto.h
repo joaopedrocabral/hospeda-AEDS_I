@@ -23,13 +23,15 @@ typedef struct {
 }Quarto;
 
 
-int inserirQuartos(Quarto *listaQuarto, int Numero, TipoQuarto Tipo, int Capacidade, float Diaria, StatusQuarto Status);
+int inserirQuartos(Quarto *listaQuarto, int *qtdQuartos, int Numero, TipoQuarto Tipo, int Capacidade, float Diaria);
 
-int removerQuartos(Quarto *listaQuarto, int Numero, StatusQuarto Status);
+int removerQuartos(Quarto *listaQuarto, int *qtdQuartos, int Numero);
 
-int buscarQuartoNumero(Quarto *listaQuarto, int Numero);
+int buscarQuartoNumero(Quarto *listaQuarto, int qtdQuartos, int Numero);
 
-void listarQuarto(Quarto *listaQuarto, StatusQuarto Status);
+void listarQuartos(Quarto *listaQuarto, int qtdQuartos, int tipoListagem);
+
+void imprimirDadosQuarto(Quarto *quarto);
 
 
 #endif

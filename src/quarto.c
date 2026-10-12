@@ -3,10 +3,6 @@
 #include <ctype.h>
 #include "../include/quarto.h"
 
-#define Max_quartos 100  //define a quantidade maxima de quartos
-
-static int qtdQuartos = 0; //variavel statica que controla a quantidade de quartos cadastrados dentro do arquivo .c
-
 const char* tipoToString(TipoQuarto tipo) {
     switch(tipo) {
         case STANDARD: return "Standard";
@@ -25,69 +21,108 @@ const char* statusToString(StatusQuarto status) {
     }
 }// Função que transforma os valores dos enums para texto legivel
 
+void imprimirDadosQuarto(Quarto *quarto){
+    printf("Número: %d\n", quarto->Numero);
+    printf("Tipo: %s\n", tipoToString(quarto->Tipo));
+    printf("Capacidade: %d\n", quarto->Capacide);
+    printf("Diária: R$ %.2f\n", quarto->Diaria);
+    printf("Status: %s\n", statusToString(quarto->Status));
+}
 
-int inserirQuartos(Quarto *listaQuarto, int Numero, TipoQuarto Tipo, int Capacidade, float Diaria, StatusQuarto Status){
-    if (qtdQuartos >=Max_quartos){
-        printf("Lista de quartos com capacidade máxima\n");
-    }//Verifica se atingiu a quantidade de quartos maxima
+int inserirQuartos(Quarto *listaQuarto, int *qtdQuartos, int Numero, TipoQuarto Tipo, int Capacidade, float Diaria){
     
-    for (int i = 0; i < qtdQuartos; i++){
-        if (listaQuarto[i].Numero == Numero){
-            printf("Quarto com este numero já está cadastrado\n");
-        }
-        
-    }// Pecorre o vetor que verifica se não tem numero repetido
+    if((buscarQuartoNumero(listaQuarto, *qtdQuartos, Numero) != -1)){
+        printf("Já existe um quarto com esse número.");
+        return 0;
+    }// Verifica se já não existe um quarto com esse número
     
-    listaQuarto[qtdQuartos].Numero == Numero;
-    listaQuarto[qtdQuartos].Tipo == Tipo;
-    listaQuarto[qtdQuartos].Capacide == Capacidade;
-    listaQuarto[qtdQuartos].Diaria == Diaria;
-    listaQuarto[qtdQuartos].Status == DISPONIVEL; //Adiciona as carecteriscas do quarto e mantem o status inicial como DISPONIVEL
+    listaQuarto[*qtdQuartos].Numero = Numero;
+    listaQuarto[*qtdQuartos].Tipo = Tipo;
+    listaQuarto[*qtdQuartos].Capacide = Capacidade;
+    listaQuarto[*qtdQuartos].Diaria = Diaria;
+    listaQuarto[*qtdQuartos].Status = DISPONIVEL; //Adiciona as carecteriscas do quarto e mantem o status inicial como DISPONIVEL
+
+    (*qtdQuartos)++;
 
     return 1;
 }
 
-int removerQuartos(Quarto *listaQuarto, int Numero, StatusQuarto Status){
+int removerQuartos(Quarto *listaQuarto, int *qtdQuartos, int Numero){
     
-    for (int i = 0; i < qtdQuartos; i++){
-        if (listaQuarto[i].Numero== Numero){
-            if (listaQuarto[i].Status != DISPONIVEL){
-                printf("Não é possivel remover, o quarto %d nao esta DISPONIVEL.\n", Numero);
-            }
-        }//Busca o quarto pelo numero e so pode remover quando estiver co o status de disponivel
-        
-        for (int j = i ; j < qtdQuartos - 1; j++){
-            listaQuarto[j] = listaQuarto[j+1];
-        }//remove o quarto e desloca o vetor.
-        qtdQuartos --;
-        return 1;
-    }
-    printf("Quarto %d não encontrado.\n", Numero);//Retorna um aviso caso o quarto do numero indicado não exista.
-    return 0;
+    //Utiliza a própria função buscar quarto para localizae o índice do quarto no vetor.
+    int indiceQuarto = buscarQuartoNumero(listaQuarto, *qtdQuartos, Numero);
 
+    //Realiza verifições se existe o quarto no vetor e se o quarto está com o status DISPONIVEL.
+    if(indiceQuarto == -1){
+        printf("Quarto não encontrado.");
+        return 0;
+    }
+
+    if(listaQuarto[indiceQuarto].Status != DISPONIVEL){
+        printf("Não é possível remover o quarto Nº %d, pois ele não está DISPONÍVEL.\n", Numero);
+        return 0;
+    }
+
+    for (int i = indiceQuarto; i < *qtdQuartos - 1; i++){
+
+        listaQuarto[i] = listaQuarto[i+1];
+
+    }
+    
+    (*qtdQuartos)--;
+
+    return 1;
 }
 
-int buscarQuartoNumero(Quarto *listaQuarto, int Numero){
-    for (int i = 0; i < qtdQuartos; i++){
-        if (listaQuarto[i].Numero){
-            printf("Quarto encontrado: \n");
-            
-            printf("Número: %d | Tipo: %s | Capacidade: %d | Diária: %.2f | Status: %s\n",listaQuarto[i].Numero,tipoToString(listaQuarto[i].Tipo),listaQuarto[i].Capacide,listaQuarto[i].Diaria, statusToString(listaQuarto[i].Status));
-            
+int buscarQuartoNumero(Quarto *listaQuarto, int qtdQuartos, int Numero){
+    
+    for(int i = 0; i < qtdQuartos; i++){
+        
+        if(listaQuarto[i].Numero == Numero){
             return i;
         }
-        printf("Quarto %d não encontrado.\n", Numero);
-        return -1;
     }
-}//Busca o quarto imprime as suas informações e caso não tenha um quarto referente ao numero irá retornar uma mensagem de aviso.
 
-void listarQuarto(Quarto *listaQuarto, StatusQuarto Status){
-    for (int i = 0; i < qtdQuartos; i++){
-        if (Status == listaQuarto[i].Status || Status == -1){
-            printf("Número: %d | Tipo: %s | Capacidade: %d | Diária: %.2f | Status: %s\n",listaQuarto[i].Numero,tipoToString(listaQuarto[i].Tipo),listaQuarto[i].Capacide,listaQuarto[i].Diaria, statusToString(listaQuarto[i].Status));
+    return -1;
+};
+
+void listarQuartos(Quarto *listaQuarto, int qtdQuartos, int tipoListagem){
+    /*
+    tipoListagem = 0 -> Listagem Completa
+    tipoListagem = 1 -> Listagem dos Disponíveis
+    */
+
+    if(tipoListagem == 0){
+
+        for(int i = 0; i < qtdQuartos; i++){
+
+            imprimirDadosQuarto(&listaQuarto[i]);
+
+            printf("\n-------------------------------\n");
         }
-        
+
+    } else if(tipoListagem == 1){
+
+        int quartosDisponiveis = 0;
+
+        for(int i = 0; i < qtdQuartos; i++){
+
+            if(listaQuarto[i].Status == DISPONIVEL){
+                imprimirDadosQuarto(&listaQuarto[i]);
+
+                printf("\n-------------------------------\n");
+
+                quartosDisponiveis++;
+            }
+
+        }
+
+        if(quartosDisponiveis == 0){
+            printf("Não há quartos diponíveis nesse momento.\n");
+        }
+
+    } else {
+        printf("Tipo de Listagem selecionada é inválida.\n");
     }
 
 }// Lista todos os quartos ou pelo seu status.
-

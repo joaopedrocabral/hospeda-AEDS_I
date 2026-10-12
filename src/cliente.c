@@ -110,7 +110,7 @@ void formatarTelefone(char telefone[], char *telefoneFormatado){
     telefoneFormatado[j] = '\0';
 }
 
-void imprimirDados(Cliente *cliente){
+void imprimirDadosCliente(Cliente *cliente){
     printf("ID: %d\n", cliente->id);
     printf("Nome: %s\n", cliente->nome);
 
@@ -175,12 +175,13 @@ int removerCliente(Cliente *listaClientes, int *qtdClientes, int idCliente){
     int indiceCliente = buscarClienteId(listaClientes, *qtdClientes, idCliente);
 
     if(indiceCliente == -1){
+        printf("Cliente não encontrado!\n");
         return 0;
     }
 
     for(int i = indiceCliente; i < *qtdClientes - 1; i++){
 
-        listaClientes[i] = listaClientes[i + 1];
+        listaClientes[i] = listaClientes[i+1];
     }
 
     (*qtdClientes)--;
@@ -197,8 +198,6 @@ int buscarClienteId(Cliente *listaClientes, int qtdClientes, int idCliente){
         }
     }
 
-    printf("ERRO! Cliente não encontrado!\n");
-
     return -1;
 };
 
@@ -211,7 +210,6 @@ int buscarClienteCpf(Cliente *listaClientes, int qtdClientes, char cpf[]){
         }
     }
 
-    printf("ERRO! Cliente não encontrado!\n");
     return -1;
 };
 
@@ -224,8 +222,6 @@ int buscarClienteNome(Cliente *listaClientes, int qtdClientes, char nome[]){
         }
     }
 
-    printf("ERRO! Cliente não encontrado!\n");
-
     return -1;
 };
 
@@ -233,7 +229,7 @@ void listarClientes(Cliente *listaClientes, int qtdClientes){
 
     for(int i = 0; i < qtdClientes; i++){
 
-        imprimirDados(&listaClientes[i]);
+        imprimirDadosCliente(&listaClientes[i]);
 
         printf("\n-------------------------------\n");
     }

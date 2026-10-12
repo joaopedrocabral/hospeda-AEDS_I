@@ -1,29 +1,15 @@
-/*
- * Projeto Hospeda - Sistema de Gerenciamento de Hotel
- * Arquivo: main.c
- *
- * Este arquivo contém o menu principal do programa.
- * As funções de cadastro, busca, listagem e remoção ficam
- * implementadas nos arquivos cliente.c e quarto.c.
- */
-
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include "../include/cliente.h"
+#include "../include/quarto.h"
 
-#include "include/cliente.h"
-#include "include/quarto.h"
 
-/* Quantidade máxima de registros que os vetores podem guardar. */
-#define MAX_CLIENTES 100
-#define MAX_QUARTOS 100
-
-/* Lê um texto com espaços e remove o '\n' colocado pelo fgets. */
 void lerTexto(char texto[], int tamanho) {
     fgets(texto, tamanho, stdin);
     texto[strcspn(texto, "\n")] = '\0';
 }
 
-/* Limpa caracteres que ficaram no teclado depois de um scanf. */
 void limparEntrada(void) {
     int caractere;
     while ((caractere = getchar()) != '\n' && caractere != EOF) {
@@ -31,11 +17,134 @@ void limparEntrada(void) {
     }
 }
 
-/* Menu com as operações de clientes. */
-void menuClientes(Cliente clientes[], int *qtdClientes) {
+int disponibilidadeClientes(Cliente **clientes, int qtdClientes, int *capacidadeClientes){
+
+    if(qtdClientes >= *capacidadeClientes){
+        int capacidadeTemp = *capacidadeClientes * 2;
+
+        Cliente *listaTemp = realloc(*clientes, capacidadeTemp * sizeof(Cliente));
+
+        if(listaTemp == NULL){
+            printf("Houve um erro ao alocar memória para Clientes.\n");
+            return 0;
+        }
+
+        *capacidadeClientes *= 2;
+
+        *clientes = listaTemp;
+
+        return 1;
+    }
+
+    return 1;
+}
+
+int disponibilidadeQuartos(Quarto **quartos, int qtdQuartos, int *capacidadeQuartos){
+
+    if(qtdQuartos >= *capacidadeQuartos){
+        int capacidadeTemp = *capacidadeQuartos * 2;
+
+        Quarto *listaTemp = realloc(*quartos, capacidadeTemp * sizeof(Quarto));
+
+        if(listaTemp == NULL){
+            printf("Houve um erro ao alocar memória para Quartos.\n");
+            return 0;
+        }
+
+        *capacidadeQuartos *= 2;
+
+        *quartos = listaTemp;
+
+        return 1;
+    }
+
+    return 1;
+}
+
+void submenuBuscarClientes(Cliente *clientes, int qtdClientes){
     int opcao;
-    int id;
-    int indice;
+
+    do {
+        printf("\n===== BUSCAR CLIENTE =====\n");
+        printf("1 - Buscar por ID\n");
+        printf("2 - Buscar por Nome\n");
+        printf("3 - Buscar por CPF\n");
+        printf("0 - Voltar\n");
+        printf("Escolha uma opção: ");
+
+        scanf("%d", &opcao);
+        limparEntrada();
+
+        switch (opcao) {
+            case 1: {
+                int idCliente;
+
+                printf("Digite o ID do cliente: ");
+                scanf("%d", &idCliente);
+                limparEntrada();
+
+                int indiceCliente = buscarClienteId(clientes, qtdClientes, idCliente);
+
+                if(indiceCliente == -1){
+                    printf("Cliente não encontrado!\n");
+                    break;
+                }
+
+                imprimirDadosCliente(&clientes[indiceCliente]);
+
+                break;
+            }
+
+            case 2: {
+                char nome[100];
+
+                printf("Nome completo: ");
+                lerTexto(nome, sizeof(nome));
+
+                int indiceCliente = buscarClienteNome(clientes, qtdClientes, nome);
+
+                if(indiceCliente == -1){
+                    printf("Cliente não encontrado!\n");
+                    break;
+                }
+
+                imprimirDadosCliente(&clientes[indiceCliente]);
+
+                break;
+            }
+
+            case 3: {
+                char cpf[20];
+
+                printf("CPF (somente números): ");
+                lerTexto(cpf, sizeof(cpf));
+
+                int indiceCliente = buscarClienteCpf(clientes, qtdClientes, cpf);
+
+                if(indiceCliente == -1){
+                    printf("Cliente não encontrado!\n");
+                    break;
+                }
+
+                imprimirDadosCliente(&clientes[indiceCliente]);
+
+                break;
+            }
+
+            case 0: {
+                break;
+            }
+
+            default: {
+                printf("Opcao invalida. Tente novamente.\n");
+            }
+        }
+        
+    } while (opcao != 0);
+}
+
+void menuClientes(Cliente **clientes, int *qtdClientes, int *capacidadeClientes, int *proximoIdCliente) {
+    int opcao;
     char nome[100];
     char cpf[20];
     char telefone[20];
@@ -43,102 +152,116 @@ void menuClientes(Cliente clientes[], int *qtdClientes) {
     do {
         printf("\n========== MENU DE CLIENTES ==========\n");
         printf("1 - Cadastrar cliente\n");
-        printf("2 - Buscar cliente por ID\n");
+        printf("2 - Buscar cliente\n");
         printf("3 - Listar clientes\n");
         printf("4 - Remover cliente\n");
         printf("0 - Voltar ao menu principal\n");
         printf("Escolha uma opcao: ");
 
-        if (scanf("%d", &opcao) != 1) {
-            limparEntrada();
-            printf("Opcao invalida. Digite um numero.\n");
-            continue;
-        }
+        scanf("%d", &opcao);
         limparEntrada();
 
         switch (opcao) {
-            case 1:
-                /* Impede ultrapassar o tamanho do vetor de clientes. */
-                if (*qtdClientes >= MAX_CLIENTES) {
-                    printf("Limite de clientes atingido.\n");
-                    break;
-                }
+            case 1: {
 
-                printf("ID do cliente: ");
-                if (scanf("%d", &id) != 1) {
-                    limparEntrada();
-                    printf("ID invalido.\n");
-                    break;
-                }
-                limparEntrada();
-
-                /* Verifica se o ID já está cadastrado. */
-                if (buscarClienteId(clientes, *qtdClientes, id) != -1) {
-                    printf("Ja existe um cliente com esse ID.\n");
+                if(!(disponibilidadeClientes(clientes, *qtdClientes, capacidadeClientes))){
+                    printf("Não é possível cadastrar novos clientes.\n");
                     break;
                 }
 
                 printf("Nome completo: ");
                 lerTexto(nome, sizeof(nome));
 
-                printf("CPF (somente numeros ou com espacos): ");
+                printf("CPF (somente números): ");
                 lerTexto(cpf, sizeof(cpf));
 
-                printf("Telefone (somente numeros ou com espacos): ");
+                printf("Telefone (somente números): ");
                 lerTexto(telefone, sizeof(telefone));
 
-                /* A função do arquivo cliente.c valida e cadastra os dados. */
-                if (inserirCliente(clientes, qtdClientes, id,
-                                   nome, cpf, telefone)) {
+                if (inserirCliente(*clientes, qtdClientes, *proximoIdCliente, nome, cpf, telefone)) {
                     printf("Cliente cadastrado com sucesso!\n");
-                } else {
-                    printf("Nao foi possivel cadastrar o cliente.\n");
-                }
-                break;
+                    (*proximoIdCliente)++;
 
-            case 2:
-                printf("Digite o ID do cliente: ");
-                if (scanf("%d", &id) != 1) {
-                    limparEntrada();
-                    printf("ID invalido.\n");
+                } else {
+                    printf("\nNão foi possivel cadastrar o cliente.\n");
                     break;
                 }
-                limparEntrada();
 
-                indice = buscarClienteId(clientes, *qtdClientes, id);
-                if (indice != -1) {
-                    printf("\n--- Dados do cliente ---\n");
-                    imprimirDados(&clientes[indice]);
+                break;
+            }
+
+            case 2: {
+                if(*qtdClientes == 0){
+                    printf("Nenhum cliente cadastrado.\n");
+
+                } else {
+                    submenuBuscarClientes(*clientes, *qtdClientes);
                 }
                 break;
+            }
 
-            case 3:
+            case 3: {
                 if (*qtdClientes == 0) {
                     printf("Nenhum cliente cadastrado.\n");
+
                 } else {
-                    listarClientes(clientes, *qtdClientes);
+                    printf("Clientes Cadastrados: %d \n\n", *qtdClientes);
+                    listarClientes(*clientes, *qtdClientes);
                 }
                 break;
+            }
 
-            case 4:
+            case 4: {
+                int idCliente;
+
                 printf("ID do cliente que deseja remover: ");
-                if (scanf("%d", &id) != 1) {
-                    limparEntrada();
-                    printf("ID invalido.\n");
-                    break;
-                }
+                scanf("%d", &idCliente);
                 limparEntrada();
 
-                if (removerCliente(clientes, qtdClientes, id)) {
-                    printf("Cliente removido com sucesso.\n");
-                } else {
-                    printf("Nao foi possivel remover: cliente nao encontrado.\n");
+                int indiceCliente = buscarClienteId(*clientes, *qtdClientes, idCliente);
+
+                if(indiceCliente == -1){
+                    printf("Cliente não encontrado.\n");
+                    break;
                 }
+
+                printf("\nDeseja realmente remover o cliente %d - %s?\n", idCliente, (*clientes)[indiceCliente].nome);
+
+                int opcao;
+
+                do {
+                    printf("\n1 - Confirmar\n");
+                    printf("2 - Cancelar\n");
+                    printf("Escolha uma opção: ");
+
+                    scanf("%d", &opcao);
+                    limparEntrada();
+
+                    switch (opcao){
+                        case 1:
+                            if(removerCliente(*clientes, qtdClientes, idCliente)) {
+                            printf("Cliente removido com sucesso.\n");
+                            }
+                        break;
+
+                        case 2:
+                            printf("Operação cancelada. Retornando ao menu clientes.\n");
+                        break;
+
+                        default:
+                            printf("Opção inválida. Tente novamente.\n");
+                    }        
+
+
+                } while (opcao != 1 && opcao != 2);
+
                 break;
+            } 
 
             case 0:
                 printf("Voltando ao menu principal...\n");
-                break;
+            break;
+
 
             default:
                 printf("Opcao invalida. Tente novamente.\n");
@@ -147,16 +270,54 @@ void menuClientes(Cliente clientes[], int *qtdClientes) {
     } while (opcao != 0);
 }
 
-/* Menu com as operações de quartos. */
-void menuQuartos(Quarto quartos[]) {
+int submenuTipoQuarto(TipoQuarto *tipoQuarto) {
+    int opcao;
+
+    do {
+        printf("Tipo do quarto:\n");
+        printf("1 - Standard\n");
+        printf("2 - Deluxe\n");
+        printf("3 - Premium\n");
+        printf("0 - Voltar\n");
+        printf("Escolha uma opção: ");
+
+        scanf("%d", &opcao);
+        limparEntrada();
+
+        switch(opcao){
+            case 1:
+                *tipoQuarto = STANDARD;
+            return 1;
+            
+            case 2:
+                *tipoQuarto = DELUXE;
+            return 1;
+
+            case 3:
+                *tipoQuarto = PREMIUM;
+            return 1;
+
+            case 0:
+                return 0;
+            break;
+
+            default:
+                printf("Opção inválida, tente novamente.\n");
+
+        }
+    } while (opcao != 0);
+
+    return 1;
+}
+
+void menuQuartos(Quarto **quartos, int *qtdQuartos, int *capacidadeQuartos) {
     int opcao;
     int numero;
     int capacidade;
     int indice;
-    int tipoEscolhido;
     float diaria;
-    TipoQuarto tipo;
-    StatusQuarto status;
+    TipoQuarto TipoQuarto;
+
 
     do {
         printf("\n========== MENU DE QUARTOS ==========\n");
@@ -173,121 +334,177 @@ void menuQuartos(Quarto quartos[]) {
             printf("Opcao invalida. Digite um numero.\n");
             continue;
         }
-        limparEntrada();
+        
 
         switch (opcao) {
-            case 1:
-                printf("Numero do quarto: ");
-                if (scanf("%d", &numero) != 1) {
-                    limparEntrada();
-                    printf("Numero invalido.\n");
+            case 1: {
+                if(!(disponibilidadeQuartos(quartos, *qtdQuartos, capacidadeQuartos))){
+                    printf("Não é possível cadastrar novos quartos.\n");
                     break;
                 }
 
-                printf("Tipo do quarto (0 - Standard, 1 - Deluxe, 2 - Premium): ");
-                if (scanf("%d", &tipoEscolhido) != 1 ||
-                    tipoEscolhido < 0 || tipoEscolhido > 2) {
-                    limparEntrada();
-                    printf("Tipo invalido.\n");
+                printf("Numero do quarto: ");
+                scanf("%d", &numero);
+                limparEntrada();
+               
+                if(!(submenuTipoQuarto(&TipoQuarto))){
+                    printf("Operação cancelada,\n");
                     break;
                 }
 
                 printf("Capacidade de pessoas: ");
-                if (scanf("%d", &capacidade) != 1 || capacidade <= 0) {
-                    limparEntrada();
-                    printf("Capacidade invalida.\n");
-                    break;
-                }
+                scanf("%d", &capacidade);
+                limparEntrada();
 
                 printf("Valor da diaria: R$ ");
-                if (scanf("%f", &diaria) != 1 || diaria <= 0) {
-                    limparEntrada();
-                    printf("Valor da diaria invalido.\n");
-                    break;
-                }
+                scanf("%f", &diaria);
                 limparEntrada();
 
-                tipo = (TipoQuarto)tipoEscolhido;
-                status = DISPONIVEL;
+                if (inserirQuartos(*quartos, qtdQuartos, numero, TipoQuarto, capacidade, diaria)) {
+                    printf("Quarto cadastrado com sucesso!\n");
 
-                /*
-                 * A função de cadastro de quartos está em quarto.c.
-                 * Ela deve armazenar os dados e atualizar a quantidade interna.
-                 */
-                if (inserirQuartos(quartos, numero, tipo,
-                                   capacidade, diaria, status)) {
-                    printf("Solicitacao de cadastro concluida.\n");
                 } else {
-                    printf("Nao foi possivel cadastrar o quarto.\n");
+                    printf("Não foi possível cadastrar o quarto.\n");
                 }
-                break;
 
-            case 2:
+                break;
+            }
+                
+            case 2: {
+                if (*qtdQuartos == 0){
+                    printf("Não há quartos cadastrados.\n");
+                    break;
+                }
+                
                 printf("Numero do quarto que deseja buscar: ");
-                if (scanf("%d", &numero) != 1) {
-                    limparEntrada();
-                    printf("Numero invalido.\n");
-                    break;
-                }
+                scanf("%d", &numero);
                 limparEntrada();
 
-                indice = buscarQuartoNumero(quartos, numero);
+                indice = buscarQuartoNumero(*quartos, *qtdQuartos, numero);
+
                 if (indice == -1) {
-                    printf("Quarto nao encontrado.\n");
-                }
-                break;
-
-            case 3:
-                /* O valor -1 indica que a listagem não deve filtrar o status. */
-                listarQuarto(quartos, (StatusQuarto)-1);
-                break;
-
-            case 4:
-                listarQuarto(quartos, DISPONIVEL);
-                break;
-
-            case 5:
-                printf("Numero do quarto que deseja remover: ");
-                if (scanf("%d", &numero) != 1) {
-                    limparEntrada();
-                    printf("Numero invalido.\n");
+                    printf("Quarto não encontrado.\n");
                     break;
                 }
-                limparEntrada();
 
-                if (removerQuartos(quartos, numero, DISPONIVEL)) {
-                    printf("Solicitacao de remocao concluida.\n");
-                } else {
-                    printf("Nao foi possivel remover o quarto.\n");
-                }
+                imprimirDadosQuarto(&(*quartos)[indice]);
+
                 break;
+            }    
+
+            case 3: {
+                if (*qtdQuartos == 0){
+                    printf("Não há quartos cadastrados.\n");
+                    break;
+
+                } else {
+                    printf("Quartos Cadastrados: %d \n\n", *qtdQuartos);
+                    listarQuartos(*quartos, *qtdQuartos, 0);
+                } 
+
+                break;
+            }
+
+            case 4: {
+                if (*qtdQuartos == 0){
+                    printf("Não há quartos cadastrados.\n");
+                    break;
+
+                } else {
+                    listarQuartos(*quartos, *qtdQuartos, 1);
+                }  
+
+                break;
+            }
+
+            case 5: {
+                printf("Numero do quarto que deseja remover: ");
+                scanf("%d", &numero);
+                limparEntrada();
+                    
+                indice = buscarQuartoNumero(*quartos, *qtdQuartos, numero);
+
+                if(indice == -1){
+                    printf("Quarto não encontrado.\n");
+                    break;
+                }
+
+                printf("Deseja realmente remover o quarto Nº %d?\n", numero);
+
+                int opcaoQuarto;
+
+                do {
+                    printf("\n1 - Confirmar\n");
+                    printf("2 - Cancelar\n");
+                    printf("Escolha uma opção: ");
+
+                    scanf("%d", &opcaoQuarto);
+                    limparEntrada();
+
+                    switch (opcaoQuarto){
+                        case 1:
+                            if(removerQuartos(*quartos, qtdQuartos, numero)) {
+                                printf("Quarto removido com sucesso.\n");
+                            }
+                        break;
+
+                        case 2:
+                            printf("Operação cancelada. Retornando ao menu quartos.\n");
+                        break;
+
+                        default:
+                            printf("Opção inválida. Tente novamente.\n");
+                    }        
+
+
+                } while (opcaoQuarto != 1 && opcaoQuarto != 2);
+              
+                break;    
+            }
 
             case 0:
                 printf("Voltando ao menu principal...\n");
-                break;
+            break;
+
 
             default:
                 printf("Opcao invalida. Tente novamente.\n");
+
         }
 
     } while (opcao != 0);
 }
 
-/* Função principal: inicia os vetores e apresenta o menu geral. */
 int main(void) {
-    /* Os vetores guardam os registros durante a execução do programa. */
-    Cliente clientes[MAX_CLIENTES];
-    Quarto quartos[MAX_QUARTOS];
 
-    /* No início, ainda não existe nenhum cliente cadastrado. */
-    int qtdClientes = 0;
+    int capacidadeClientes = 100; /*Capacidade inicial de clientes*/
+    int qtdClientes = 0; /*Clientes cadastrados*/
+    int capacidadeQuartos = 100;
+    int qtdQuartos = 0;
+    int proximoIdCliente = 100;
+
+    /* Os vetores guardam os registros durante a execução do programa. */
+    Cliente *clientes = malloc(capacidadeClientes * sizeof(Cliente));
+
+    if(clientes == NULL){
+        printf("Ocorreu um erro na alocação de memória para Clientes.");
+        return 0;
+    }
+
+    Quarto *quartos = malloc(capacidadeQuartos * sizeof(Quarto));
+
+    if(quartos == NULL){
+        printf("Ocorreu um erro na alocação de memória para Quartos.");
+        return 0;
+    }
+
     int opcao;
 
     do {
         printf("\n========================================\n");
         printf("       HOSPEDA - SISTEMA DE HOTEL\n");
         printf("========================================\n");
-        printf("1 - Gerenciar clientes\n");
+        printf("\n1 - Gerenciar clientes\n");
         printf("2 - Gerenciar quartos\n");
         printf("0 - Encerrar programa\n");
         printf("Escolha uma opcao: ");
@@ -301,16 +518,16 @@ int main(void) {
 
         switch (opcao) {
             case 1:
-                menuClientes(clientes, &qtdClientes);
-                break;
+                menuClientes(&clientes, &qtdClientes, &capacidadeClientes, &proximoIdCliente);
+            break;
 
             case 2:
-                menuQuartos(quartos);
-                break;
+                menuQuartos(&quartos, &qtdQuartos, &capacidadeQuartos);
+            break;
 
             case 0:
                 printf("Programa encerrado. Obrigado por utilizar o Hospeda!\n");
-                break;
+            break;
 
             default:
                 printf("Opcao invalida. Tente novamente.\n");
@@ -318,5 +535,7 @@ int main(void) {
 
     } while (opcao != 0);
 
+    free(clientes);
+    free(quartos);
     return 0;
 }

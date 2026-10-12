@@ -26,4 +26,4 @@ void formatarCpf(char cpf[], char *cpfFormatado);
 int validarTelefone(char telefone[]);
 void formatarTelefone(char telefone[], char *telefoneFormatado);
 
-void imprimirDados(Cliente *cliente);
+void imprimirDadosCliente(Cliente *cliente);
