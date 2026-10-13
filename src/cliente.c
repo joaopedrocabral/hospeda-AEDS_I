@@ -149,15 +149,21 @@ int inserirCliente(Cliente *listaClientes, int *qtdClientes, int idCliente, char
 
     }
 
+    char cpfFormatado[20];
+    formatarCpf(cpf, cpfFormatado);
+
+    if((buscarClienteCpf(listaClientes, *qtdClientes, cpfFormatado)) != -1){
+        printf("Já existe um cliente com esse CPF.");
+        return 0;
+    };
+
     novoCliente.id = idCliente;
+
+    strcpy(novoCliente.cpf, cpfFormatado);
 
     char nomeFormatado[100];
     formatarNome(nome, nomeFormatado);
     strcpy(novoCliente.nome, nomeFormatado);
-
-    char cpfFormatado[20];
-    formatarCpf(cpf, cpfFormatado);
-    strcpy(novoCliente.cpf, cpfFormatado);
 
     char telefoneFormatado[20];
     formatarTelefone(telefone, telefoneFormatado);
