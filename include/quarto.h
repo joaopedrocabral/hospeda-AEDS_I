@@ -1,7 +1,6 @@
 #ifndef QUARTO_H
 #define QUARTO_H
 
-
 typedef enum {
     STANDARD,
     DELUXE,

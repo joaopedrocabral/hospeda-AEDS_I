@@ -10,7 +10,7 @@ const char* tipoToString(TipoQuarto tipo) {
         case PREMIUM:  return "Premium";
         default:       return "Desconhecido";
     }
-} // Função que transforma os valores dos enums para texto legivel
+}
 
 const char* statusToString(StatusQuarto status) {
     switch(status) {
@@ -76,7 +76,7 @@ int removerQuartos(Quarto *listaQuarto, int *qtdQuartos, int Numero){
 
 int buscarQuartoNumero(Quarto *listaQuarto, int qtdQuartos, int Numero){
     
-    for(int i = 0; i < qtdQuartos; i++){
+    for(int i = 0; i < qtdQuartos; i++){ //O(n)
         
         if(listaQuarto[i].Numero == Numero){
             return i;
@@ -98,7 +98,7 @@ void listarQuartos(Quarto *listaQuarto, int qtdQuartos, int tipoListagem){
 
             imprimirDadosQuarto(&listaQuarto[i]);
 
-            printf("\n-------------------------------\n");
+            printf("\n-------------------------------\n\n");
         }
 
     } else if(tipoListagem == 1){
@@ -110,7 +110,7 @@ void listarQuartos(Quarto *listaQuarto, int qtdQuartos, int tipoListagem){
             if(listaQuarto[i].Status == DISPONIVEL){
                 imprimirDadosQuarto(&listaQuarto[i]);
 
-                printf("\n-------------------------------\n");
+                printf("\n-------------------------------\n\n");
 
                 quartosDisponiveis++;
             }

@@ -4,6 +4,13 @@
 #include "../include/cliente.h"
 #include "../include/quarto.h"
 
+void limparTela(void){ //Função responsável por limpar a tela do terminal. Identifica se o sistema é Windows ou Linux/macOS
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
+}
 
 void lerTexto(char texto[], int tamanho) {
     fgets(texto, tamanho, stdin);
@@ -70,7 +77,7 @@ void submenuBuscarClientes(Cliente *clientes, int qtdClientes){
         printf("2 - Buscar por Nome\n");
         printf("3 - Buscar por CPF\n");
         printf("0 - Voltar\n");
-        printf("Escolha uma opção: ");
+        printf("\nEscolha uma opção: ");
 
         scanf("%d", &opcao);
         limparEntrada();
@@ -79,17 +86,20 @@ void submenuBuscarClientes(Cliente *clientes, int qtdClientes){
             case 1: {
                 int idCliente;
 
-                printf("Digite o ID do cliente: ");
+                printf("\nDigite o ID do cliente: ");
                 scanf("%d", &idCliente);
                 limparEntrada();
 
                 int indiceCliente = buscarClienteId(clientes, qtdClientes, idCliente);
 
+                limparTela();
+
                 if(indiceCliente == -1){
-                    printf("Cliente não encontrado!\n");
+                    printf("Cliente não encontrado.\n");
                     break;
                 }
 
+                printf("\nCliente localizado:\n\n");
                 imprimirDadosCliente(&clientes[indiceCliente]);
 
                 break;
@@ -98,16 +108,19 @@ void submenuBuscarClientes(Cliente *clientes, int qtdClientes){
             case 2: {
                 char nome[100];
 
-                printf("Nome completo: ");
+                printf("\nNome completo: ");
                 lerTexto(nome, sizeof(nome));
 
                 int indiceCliente = buscarClienteNome(clientes, qtdClientes, nome);
+
+                limparTela();
 
                 if(indiceCliente == -1){
                     printf("Cliente não encontrado!\n");
                     break;
                 }
 
+                printf("\nCliente localizado:\n\n");
                 imprimirDadosCliente(&clientes[indiceCliente]);
 
                 break;
@@ -116,26 +129,31 @@ void submenuBuscarClientes(Cliente *clientes, int qtdClientes){
             case 3: {
                 char cpf[20];
 
-                printf("CPF (somente números): ");
+                printf("\nCPF (somente números): ");
                 lerTexto(cpf, sizeof(cpf));
 
                 int indiceCliente = buscarClienteCpf(clientes, qtdClientes, cpf);
+
+                limparTela();
 
                 if(indiceCliente == -1){
                     printf("Cliente não encontrado!\n");
                     break;
                 }
 
+                printf("\nCliente localizado:\n\n");
                 imprimirDadosCliente(&clientes[indiceCliente]);
 
                 break;
             }
 
             case 0: {
+                limparTela();
                 break;
             }
 
             default: {
+                limparTela();
                 printf("Opcao invalida. Tente novamente.\n");
             }
         }
@@ -156,7 +174,7 @@ void menuClientes(Cliente **clientes, int *qtdClientes, int *capacidadeClientes,
         printf("3 - Listar clientes\n");
         printf("4 - Remover cliente\n");
         printf("0 - Voltar ao menu principal\n");
-        printf("Escolha uma opcao: ");
+        printf("\nEscolha uma opcao: ");
 
         scanf("%d", &opcao);
         limparEntrada();
@@ -169,7 +187,7 @@ void menuClientes(Cliente **clientes, int *qtdClientes, int *capacidadeClientes,
                     break;
                 }
 
-                printf("Nome completo: ");
+                printf("\nNome completo: ");
                 lerTexto(nome, sizeof(nome));
 
                 printf("CPF (somente números): ");
@@ -178,8 +196,10 @@ void menuClientes(Cliente **clientes, int *qtdClientes, int *capacidadeClientes,
                 printf("Telefone (somente números): ");
                 lerTexto(telefone, sizeof(telefone));
 
+                limparTela();
+
                 if (inserirCliente(*clientes, qtdClientes, *proximoIdCliente, nome, cpf, telefone)) {
-                    printf("Cliente cadastrado com sucesso!\n");
+                    printf("\nCliente cadastrado com sucesso.\n");
                     (*proximoIdCliente)++;
 
                 } else {
@@ -191,6 +211,8 @@ void menuClientes(Cliente **clientes, int *qtdClientes, int *capacidadeClientes,
             }
 
             case 2: {
+                limparTela();
+
                 if(*qtdClientes == 0){
                     printf("Nenhum cliente cadastrado.\n");
 
@@ -201,6 +223,8 @@ void menuClientes(Cliente **clientes, int *qtdClientes, int *capacidadeClientes,
             }
 
             case 3: {
+                limparTela();
+
                 if (*qtdClientes == 0) {
                     printf("Nenhum cliente cadastrado.\n");
 
@@ -212,6 +236,12 @@ void menuClientes(Cliente **clientes, int *qtdClientes, int *capacidadeClientes,
             }
 
             case 4: {
+                if(*qtdClientes == 0){
+                    limparTela();
+                    printf("Nenhum cliente cadastrado.\n");
+                    break;
+                }
+
                 int idCliente;
 
                 printf("ID do cliente que deseja remover: ");
@@ -219,6 +249,8 @@ void menuClientes(Cliente **clientes, int *qtdClientes, int *capacidadeClientes,
                 limparEntrada();
 
                 int indiceCliente = buscarClienteId(*clientes, *qtdClientes, idCliente);
+
+                limparTela();
 
                 if(indiceCliente == -1){
                     printf("Cliente não encontrado.\n");
@@ -232,10 +264,12 @@ void menuClientes(Cliente **clientes, int *qtdClientes, int *capacidadeClientes,
                 do {
                     printf("\n1 - Confirmar\n");
                     printf("2 - Cancelar\n");
-                    printf("Escolha uma opção: ");
+                    printf("\nEscolha uma opção: ");
 
                     scanf("%d", &opcao);
                     limparEntrada();
+
+                    limparTela();
 
                     switch (opcao){
                         case 1:
@@ -259,12 +293,14 @@ void menuClientes(Cliente **clientes, int *qtdClientes, int *capacidadeClientes,
             } 
 
             case 0:
+                limparTela();
                 printf("Voltando ao menu principal...\n");
             break;
 
 
             default:
-                printf("Opcao invalida. Tente novamente.\n");
+                limparTela();
+                printf("Opcao inválida. Tente novamente.\n");
         }
 
     } while (opcao != 0);
@@ -279,7 +315,7 @@ int submenuTipoQuarto(TipoQuarto *tipoQuarto) {
         printf("2 - Deluxe\n");
         printf("3 - Premium\n");
         printf("0 - Voltar\n");
-        printf("Escolha uma opção: ");
+        printf("\nEscolha uma opção: ");
 
         scanf("%d", &opcao);
         limparEntrada();
@@ -327,7 +363,7 @@ void menuQuartos(Quarto **quartos, int *qtdQuartos, int *capacidadeQuartos) {
         printf("4 - Listar quartos disponiveis\n");
         printf("5 - Remover quarto\n");
         printf("0 - Voltar ao menu principal\n");
-        printf("Escolha uma opcao: ");
+        printf("\nEscolha uma opcao: ");
 
         if (scanf("%d", &opcao) != 1) {
             limparEntrada();
@@ -339,16 +375,18 @@ void menuQuartos(Quarto **quartos, int *qtdQuartos, int *capacidadeQuartos) {
         switch (opcao) {
             case 1: {
                 if(!(disponibilidadeQuartos(quartos, *qtdQuartos, capacidadeQuartos))){
+                    limparTela();
                     printf("Não é possível cadastrar novos quartos.\n");
                     break;
                 }
 
-                printf("Numero do quarto: ");
+                printf("\nNúmero do quarto: ");
                 scanf("%d", &numero);
                 limparEntrada();
                
                 if(!(submenuTipoQuarto(&TipoQuarto))){
-                    printf("Operação cancelada,\n");
+                    limparTela();
+                    printf("Operação cancelada.\n");
                     break;
                 }
 
@@ -359,6 +397,8 @@ void menuQuartos(Quarto **quartos, int *qtdQuartos, int *capacidadeQuartos) {
                 printf("Valor da diaria: R$ ");
                 scanf("%f", &diaria);
                 limparEntrada();
+
+                limparTela();
 
                 if (inserirQuartos(*quartos, qtdQuartos, numero, TipoQuarto, capacidade, diaria)) {
                     printf("Quarto cadastrado com sucesso!\n");
@@ -372,27 +412,33 @@ void menuQuartos(Quarto **quartos, int *qtdQuartos, int *capacidadeQuartos) {
                 
             case 2: {
                 if (*qtdQuartos == 0){
+                    limparTela();
                     printf("Não há quartos cadastrados.\n");
                     break;
                 }
                 
-                printf("Numero do quarto que deseja buscar: ");
+                printf("Número do quarto que deseja buscar: ");
                 scanf("%d", &numero);
                 limparEntrada();
 
                 indice = buscarQuartoNumero(*quartos, *qtdQuartos, numero);
+
+                limparTela();
 
                 if (indice == -1) {
                     printf("Quarto não encontrado.\n");
                     break;
                 }
 
+                printf("\nQuarto localizado:\n\n");
                 imprimirDadosQuarto(&(*quartos)[indice]);
 
                 break;
             }    
 
             case 3: {
+                limparTela();
+
                 if (*qtdQuartos == 0){
                     printf("Não há quartos cadastrados.\n");
                     break;
@@ -406,6 +452,8 @@ void menuQuartos(Quarto **quartos, int *qtdQuartos, int *capacidadeQuartos) {
             }
 
             case 4: {
+                limparTela();
+
                 if (*qtdQuartos == 0){
                     printf("Não há quartos cadastrados.\n");
                     break;
@@ -418,11 +466,19 @@ void menuQuartos(Quarto **quartos, int *qtdQuartos, int *capacidadeQuartos) {
             }
 
             case 5: {
-                printf("Numero do quarto que deseja remover: ");
+                if (*qtdQuartos == 0){
+                    limparTela();
+                    printf("Não há quartos cadastrados.\n");
+                    break;
+                }
+
+                printf("Número do quarto que deseja remover: ");
                 scanf("%d", &numero);
                 limparEntrada();
                     
                 indice = buscarQuartoNumero(*quartos, *qtdQuartos, numero);
+
+                limparTela();
 
                 if(indice == -1){
                     printf("Quarto não encontrado.\n");
@@ -436,10 +492,12 @@ void menuQuartos(Quarto **quartos, int *qtdQuartos, int *capacidadeQuartos) {
                 do {
                     printf("\n1 - Confirmar\n");
                     printf("2 - Cancelar\n");
-                    printf("Escolha uma opção: ");
+                    printf("\nEscolha uma opção: ");
 
                     scanf("%d", &opcaoQuarto);
                     limparEntrada();
+
+                    limparTela();
 
                     switch (opcaoQuarto){
                         case 1:
@@ -463,12 +521,14 @@ void menuQuartos(Quarto **quartos, int *qtdQuartos, int *capacidadeQuartos) {
             }
 
             case 0:
+                limparTela();
                 printf("Voltando ao menu principal...\n");
             break;
 
 
             default:
-                printf("Opcao invalida. Tente novamente.\n");
+                limparTela();
+                printf("Opção inválida. Tente novamente.\n");
 
         }
 
@@ -507,7 +567,7 @@ int main(void) {
         printf("\n1 - Gerenciar clientes\n");
         printf("2 - Gerenciar quartos\n");
         printf("0 - Encerrar programa\n");
-        printf("Escolha uma opcao: ");
+        printf("\nEscolha uma opção: ");
 
         if (scanf("%d", &opcao) != 1) {
             limparEntrada();
@@ -518,18 +578,22 @@ int main(void) {
 
         switch (opcao) {
             case 1:
+                limparTela();
                 menuClientes(&clientes, &qtdClientes, &capacidadeClientes, &proximoIdCliente);
             break;
 
             case 2:
+                limparTela();
                 menuQuartos(&quartos, &qtdQuartos, &capacidadeQuartos);
             break;
 
             case 0:
+                limparTela();
                 printf("Programa encerrado. Obrigado por utilizar o Hospeda!\n");
             break;
 
             default:
+                limparTela();
                 printf("Opcao invalida. Tente novamente.\n");
         }
 

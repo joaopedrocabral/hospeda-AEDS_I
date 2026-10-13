@@ -191,9 +191,9 @@ int removerCliente(Cliente *listaClientes, int *qtdClientes, int idCliente){
 
 int buscarClienteId(Cliente *listaClientes, int qtdClientes, int idCliente){
     
-    for(int i = 0; i < qtdClientes; i++){
+    for(int i = 0; i < qtdClientes; i++){ //O(n)
         
-        if(listaClientes[i].id == idCliente){
+        if(listaClientes[i].id == idCliente){ 
             return i;
         }
     }
@@ -231,6 +231,6 @@ void listarClientes(Cliente *listaClientes, int qtdClientes){
 
         imprimirDadosCliente(&listaClientes[i]);
 
-        printf("\n-------------------------------\n");
+        printf("\n-------------------------------------\n\n");
     }
 }
