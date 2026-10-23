@@ -267,6 +267,7 @@ void menuClientes(Cliente **clientes, int *qtdClientes, int *capacidadeClientes,
                     printf("\nEscolha uma opção: ");
 
                     scanf("%d", &opcao);
+                    
                     limparEntrada();
 
                     limparTela();
