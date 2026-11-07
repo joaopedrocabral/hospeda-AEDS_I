@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -21,108 +22,179 @@ const char* statusToString(StatusQuarto status) {
     }
 }// Função que transforma os valores dos enums para texto legivel
 
+// Obtém o andar a partir do número do quarto
+int obterAndar(int Numero){
+    return Numero / 100;
+}
+
+//Cria e inicializa um novo quarto
+Quarto *criarQuarto(int Numero,TipoQuarto Tipo,int Capacidade,float Diaria,StatusQuarto Status){
+    
+    Quarto *novo = malloc(sizeof(Quarto));
+    
+    if(novo == NULL){
+        return NULL;
+    }
+    novo ->Numero = Numero;
+    novo ->Andar = obterAndar(Numero);
+
+    novo ->Tipo = Tipo;
+    novo ->Capacidade = Capacidade;
+
+    novo ->Diaria = Diaria;
+
+    novo ->Status = Status;
+
+    novo ->esq = NULL;
+    novo ->dir = NULL;
+
+    return novo;
+}
+
+
 void imprimirDadosQuarto(Quarto *quarto){
+    if(quarto == NULL){
+        return;
+    }
     printf("Número: %d\n", quarto->Numero);
+    printf ("Andar: %d\n",quarto ->Andar);
     printf("Tipo: %s\n", tipoToString(quarto->Tipo));
-    printf("Capacidade: %d\n", quarto->Capacide);
+    printf("Capacidade: %d\n", quarto->Capacidade);
     printf("Diária: R$ %.2f\n", quarto->Diaria);
     printf("Status: %s\n", statusToString(quarto->Status));
 }
 
-int inserirQuartos(Quarto *listaQuarto, int *qtdQuartos, int Numero, TipoQuarto Tipo, int Capacidade, float Diaria){
-    
-    if((buscarQuartoNumero(listaQuarto, *qtdQuartos, Numero) != -1)){
-        printf("Já existe um quarto com esse número.");
-        return 0;
-    }// Verifica se já não existe um quarto com esse número
-    
-    listaQuarto[*qtdQuartos].Numero = Numero;
-    listaQuarto[*qtdQuartos].Tipo = Tipo;
-    listaQuarto[*qtdQuartos].Capacide = Capacidade;
-    listaQuarto[*qtdQuartos].Diaria = Diaria;
-    listaQuarto[*qtdQuartos].Status = DISPONIVEL; //Adiciona as carecteriscas do quarto e mantem o status inicial como DISPONIVEL
+// Insere um quarto na árvore
+Quarto *inserirQuartos(Quarto *raiz,Quarto *novo){
+    if (raiz == NULL){
+        return novo;
+    }
 
-    (*qtdQuartos)++;
-
-    return 1;
+    if (novo ->Numero < raiz->Numero){
+        raiz ->esq = inserirQuartos(
+            raiz->esq,
+            novo
+        );
+    }else if (novo->Numero > raiz->Numero){
+        raiz ->dir = inserirQuartos(
+            raiz->dir,
+            novo
+        );
+    }else{
+        printf("Já existe um quarto com o número %d.\n",novo->Numero);
+        free(novo);
+    }
+    return raiz;
 }
 
-int removerQuartos(Quarto *listaQuarto, int *qtdQuartos, int Numero){
-    
-    //Utiliza a própria função buscar quarto para localizae o índice do quarto no vetor.
-    int indiceQuarto = buscarQuartoNumero(listaQuarto, *qtdQuartos, Numero);
-
-    //Realiza verifições se existe o quarto no vetor e se o quarto está com o status DISPONIVEL.
-    if(indiceQuarto == -1){
-        printf("Quarto não encontrado.");
-        return 0;
-    }
-
-    if(listaQuarto[indiceQuarto].Status != DISPONIVEL){
-        printf("Não é possível remover o quarto Nº %d, pois ele não está DISPONÍVEL.\n", Numero);
-        return 0;
-    }
-
-    for (int i = indiceQuarto; i < *qtdQuartos - 1; i++){
-
-        listaQuarto[i] = listaQuarto[i+1];
-
+// Encontra o menor quarto da subárvore
+Quarto *menorQuarto(Quarto *raiz){
+    while (raiz != NULL && raiz ->esq != NULL){
+        raiz = raiz ->esq;
     }
     
-    (*qtdQuartos)--;
-
-    return 1;
+    return raiz;
 }
 
-int buscarQuartoNumero(Quarto *listaQuarto, int qtdQuartos, int Numero){
+// Remove um quarto da árvore
+Quarto *removerQuartos(Quarto *raiz, int Numero){
+    if (raiz == NULL){
+        return NULL;
+    }
     
-    for(int i = 0; i < qtdQuartos; i++){ //O(n)
+    if (Numero < raiz->Numero){
+        raiz->esq = removerQuartos(raiz->esq, Numero);
+    }else if(Numero > raiz->Numero){
+        raiz->dir = removerQuartos(raiz->dir, Numero);
+    }else{
         
-        if(listaQuarto[i].Numero == Numero){
-            return i;
+        /*Quarto com status diferente de disponivel*/
+        if (raiz->Status != DISPONIVEL){
+            printf("\nNão foi possivel remover Quarto %d.\n",Numero);
+            return raiz;
         }
+
+        /*Sem filhos*/
+        if (raiz->esq== NULL && raiz->dir == NULL){
+            free(raiz);
+            return NULL;
+        }
+
+        /*Só um filho na direita*/
+        if (raiz->esq == NULL){
+            Quarto *temp = raiz ->dir;
+            free(raiz);
+            return temp;
+        }
+        
+        /*Só um filho na esquerda*/
+        if (raiz->dir == NULL){
+            Quarto *temp = raiz ->esq;
+            free(raiz);
+            return temp;
+        }
+
+        /*Dois filhos*/
+        Quarto *temp = menorQuarto(raiz->dir);
+
+        // Copia os dados do sucessor
+        raiz->Numero = temp->Numero;
+        raiz->Andar = temp->Andar;
+        raiz->Tipo = temp->Tipo;
+        raiz->Capacidade = temp ->Capacidade;
+        raiz->Diaria = temp->Diaria;
+        raiz ->Status = temp->Status;
+
+        // Remove o sucessor da árvore
+        raiz->dir = removerQuartos(raiz->dir, temp->Numero);
     }
 
-    return -1;
-};
+    return raiz;
 
-void listarQuartos(Quarto *listaQuarto, int qtdQuartos, int tipoListagem){
-    /*
-    tipoListagem = 0 -> Listagem Completa
-    tipoListagem = 1 -> Listagem dos Disponíveis
-    */
+}
 
-    if(tipoListagem == 0){
-
-        for(int i = 0; i < qtdQuartos; i++){
-
-            imprimirDadosQuarto(&listaQuarto[i]);
-
-            printf("\n-------------------------------\n\n");
-        }
-
-    } else if(tipoListagem == 1){
-
-        int quartosDisponiveis = 0;
-
-        for(int i = 0; i < qtdQuartos; i++){
-
-            if(listaQuarto[i].Status == DISPONIVEL){
-                imprimirDadosQuarto(&listaQuarto[i]);
-
-                printf("\n-------------------------------\n\n");
-
-                quartosDisponiveis++;
-            }
-
-        }
-
-        if(quartosDisponiveis == 0){
-            printf("Não há quartos diponíveis nesse momento.\n");
-        }
-
-    } else {
-        printf("Tipo de Listagem selecionada é inválida.\n");
+// Busca um quarto pelo número
+Quarto *buscarQuartoNumero(Quarto *raiz, int Numero){
+    if (raiz==NULL){
+        return NULL;
     }
 
-}// Lista todos os quartos ou pelo seu status.
+    if (raiz->Numero == Numero){
+        return raiz;
+    }
+
+    if (Numero < raiz->Numero){
+        return buscarQuartoNumero(
+            raiz->esq,
+            Numero
+        );
+    }
+
+    if (Numero > raiz->Numero){
+        return buscarQuartoNumero(
+            raiz->dir,
+            Numero
+        );
+    }
+
+    return NULL;
+}
+
+// Lista os quartos em ordem crescente
+void listarQuartos(Quarto *raiz){
+    if (raiz == NULL){
+        return;
+    }
+    
+    //pecorre a subarvore da esquerda
+    listarQuartos(raiz->esq);
+    
+    //quarto atual
+    imprimirDadosQuarto(raiz);
+
+    printf("\n=====================\n");
+
+    //pecorre a subarvore da direita
+    listarQuartos(raiz->dir);
+    
+}
