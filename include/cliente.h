@@ -1,21 +1,36 @@
-typedef struct {
+typedef struct
+{
     int id;
     char nome[100];
     char cpf[20];
     char telefone[20];
 } Cliente;
 
-int inserirCliente(Cliente *listaClientes, int *qtdClientes, int idCliente, char nome[], char cpf[], char telefone[]);
+typedef struct NoCliente
+{
+    Cliente dados;
+    struct NoCliente *proximo;
+} NoCliente;
 
-int removerCliente(Cliente *listaClientes, int *qtdClientes, int idCliente);
+typedef struct
+{
+    NoCliente *primeiro;
+    NoCliente *ultimo;
+} ListaClientes;
 
-int buscarClienteId(Cliente *listaClientes, int qtdClientes, int idCliente);
+int inicializarLista(ListaClientes *listaClientes);
 
-int buscarClienteCpf(Cliente *listaClientes, int qtdClientes, char cpf[]);
+int inserirCliente(ListaClientes *listaClientes, int *qtdClientes, int idCliente, char nome[], char cpf[], char telefone[]);
 
-int buscarClienteNome(Cliente *listaClientes, int qtdClientes, char nome[]);
+int removerCliente(ListaClientes *listaClientes, int *qtdClientes, int idCliente);
 
-void listarClientes(Cliente *listaClientes, int qtdClientes);
+NoCliente *buscarClienteId(ListaClientes *listaClientes, int idCliente);
+
+NoCliente *buscarClienteCpf(ListaClientes *listaClientes, char cpf[]);
+
+NoCliente *buscarClienteNome(ListaClientes *listaClientes, char nome[]);
+
+void listarClientes(ListaClientes *listaClientes);
 
 int validarNome(char nome[]);
 void formatarNome(char nome[], char *nomeFormatado);

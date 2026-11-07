@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
 #include "../include/cliente.h"
 
@@ -125,9 +126,24 @@ void imprimirDadosCliente(Cliente *cliente){
 
 }
 
-int inserirCliente(Cliente *listaClientes, int *qtdClientes, int idCliente, char nome[], char cpf[], char telefone[]){
-    Cliente novoCliente;
+int inicializarLista(ListaClientes *listaClientes){
+    NoCliente *novoNo = malloc(sizeof(NoCliente));
 
+    if(novoNo == NULL){
+        printf("Erro ao alocar memória.\n");
+        return 0;
+    }
+
+    novoNo->proximo = NULL;
+
+    listaClientes->primeiro = novoNo;
+    listaClientes->ultimo = novoNo;
+
+    return 1;
+}
+
+int inserirCliente(ListaClientes *listaClientes, int *qtdClientes, int idCliente, char nome[], char cpf[], char telefone[]){
+    
     if(!validarNome(nome)){
 
         printf("ERRO! O nome digitado é inválido!\n");
@@ -152,91 +168,124 @@ int inserirCliente(Cliente *listaClientes, int *qtdClientes, int idCliente, char
     char cpfFormatado[20];
     formatarCpf(cpf, cpfFormatado);
 
-    if((buscarClienteCpf(listaClientes, *qtdClientes, cpfFormatado)) != -1){
+    if((buscarClienteCpf(listaClientes, cpfFormatado)) != NULL){
         printf("Já existe um cliente com esse CPF.");
         return 0;
     };
 
-    novoCliente.id = idCliente;
+    NoCliente *novoNo = malloc(sizeof(NoCliente));
 
-    strcpy(novoCliente.cpf, cpfFormatado);
+    if(novoNo == NULL){
+        printf("Erro ao alocar memória.\n");
+        return 0;
+    }
+
+    novoNo->dados.id = idCliente;
+
+    strcpy(novoNo->dados.cpf, cpfFormatado);
 
     char nomeFormatado[100];
     formatarNome(nome, nomeFormatado);
-    strcpy(novoCliente.nome, nomeFormatado);
+    strcpy(novoNo->dados.nome, nomeFormatado);
 
     char telefoneFormatado[20];
     formatarTelefone(telefone, telefoneFormatado);
-    strcpy(novoCliente.telefone, telefoneFormatado);
+    strcpy(novoNo->dados.telefone, telefoneFormatado);
 
-    listaClientes[*qtdClientes] = novoCliente;
+    novoNo->proximo = NULL;
+
+    listaClientes->ultimo->proximo = novoNo;
+
+    listaClientes->ultimo = novoNo;
 
     (*qtdClientes)++;
 
     return 1;
 }
 
-int removerCliente(Cliente *listaClientes, int *qtdClientes, int idCliente){
+int removerCliente(ListaClientes *listaClientes, int *qtdClientes, int idCliente){
 
-    int indiceCliente = buscarClienteId(listaClientes, *qtdClientes, idCliente);
+    NoCliente *anterior = listaClientes->primeiro;
+    NoCliente *atual = anterior->proximo;
 
-    if(indiceCliente == -1){
+    while(atual != NULL && atual->dados.id != idCliente){
+        anterior = atual;
+        atual = atual->proximo;
+    }
+
+    if(atual == NULL){
         printf("Cliente não encontrado!\n");
         return 0;
     }
 
-    for(int i = indiceCliente; i < *qtdClientes - 1; i++){
+    anterior->proximo = atual->proximo;
 
-        listaClientes[i] = listaClientes[i+1];
+    if(atual == listaClientes->ultimo){
+        listaClientes->ultimo = anterior;
     }
+
+    free(atual);
 
     (*qtdClientes)--;
 
     return 1;
 }
 
-int buscarClienteId(Cliente *listaClientes, int qtdClientes, int idCliente){
+NoCliente *buscarClienteId(ListaClientes *listaClientes, int idCliente){
     
-    for(int i = 0; i < qtdClientes; i++){ //O(n)
-        
-        if(listaClientes[i].id == idCliente){ 
-            return i;
+    NoCliente *atual = listaClientes->primeiro->proximo;
+
+    while(atual != NULL){
+        if(atual->dados.id == idCliente){
+            return atual;
         }
+        
+        atual = atual->proximo;
     }
 
-    return -1;
+    return NULL;
 };
 
-int buscarClienteCpf(Cliente *listaClientes, int qtdClientes, char cpf[]){
+NoCliente *buscarClienteCpf(ListaClientes *listaClientes, char cpf[]){
     
-    for(int i = 0; i < qtdClientes; i++){
-        
-        if((strcmp(listaClientes[i].cpf, cpf)) == 0){
-            return i;
+    NoCliente *atual = listaClientes->primeiro->proximo;
+
+    while (atual != NULL){
+        if(strcmp(atual->dados.cpf, cpf) == 0) {
+            return atual;
         }
+
+        atual = atual->proximo;
     }
 
-    return -1;
+    return NULL;
 };
 
-int buscarClienteNome(Cliente *listaClientes, int qtdClientes, char nome[]){
+NoCliente *buscarClienteNome(ListaClientes *listaClientes, char nome[]){
     
-    for(int i = 0; i < qtdClientes; i++){
-        
-        if((strcmp(listaClientes[i].nome, nome)) == 0){
-            return i;
-        }
-    }
+   NoCliente *atual = listaClientes->primeiro->proximo;
 
-    return -1;
+   while(atual != NULL){
+        if(strcmp(atual->dados.nome, nome) == 0){
+            return atual;
+        }
+
+        atual = atual->proximo;
+   }
+
+    return NULL;
 };
 
-void listarClientes(Cliente *listaClientes, int qtdClientes){
+void listarClientes(ListaClientes *listaClientes){
 
-    for(int i = 0; i < qtdClientes; i++){
+    NoCliente *atual = listaClientes->primeiro->proximo;
 
-        imprimirDadosCliente(&listaClientes[i]);
+    while(atual != NULL){
+
+        imprimirDadosCliente(&atual->dados);
 
         printf("\n-------------------------------------\n\n");
+
+        atual = atual->proximo;
     }
 }
