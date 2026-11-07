@@ -595,7 +595,7 @@ int main(void) {
 
             default:
                 limparTela();
-                printf("Opcao invalida. Tente novamente.\n");
+                printf("Opcao inválida. Tente novamente.\n");
         }
 
     } while (opcao != 0);
