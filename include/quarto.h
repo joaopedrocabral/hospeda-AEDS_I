@@ -26,10 +26,10 @@ typedef struct Quarto {
     struct Quarto *dir;
 }Quarto;
 
-/*Cria dinamicamente um novo nó (quarto) da árvore.O andar é calculado automaticamente a partir do número do quarto.Retorna:
+/*Cria dinamicamente um novo nó (quarto) da árvore. O andar é calculado automaticamente a partir do número do quarto. Retorna:
 - Ponteiro para o novo quarto criado.
 - NULL em caso de falha na alocação.*/
-Quarto *criarQuarto(int Numero,TipoQuarto Tipo,int Capacidade,float Diaria,StatusQuarto Status);
+Quarto *criarQuarto(int Numero, TipoQuarto Tipo, int Capacidade, float Diaria, StatusQuarto Status);
 
 /*Insere um novo quarto na Árvore Binária de Busca.O número do quarto é utilizado como chave de ordenação.Retorna:
 - A raiz atualizada da árvore.*/

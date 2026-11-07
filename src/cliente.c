@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "../include/cliente.h"
+#include "../include/reserva.h"
 
 int validarNome(char nome[]){
     int contemLetras = 0;
@@ -126,11 +127,11 @@ void imprimirDadosCliente(Cliente *cliente){
 
 }
 
-int inicializarLista(ListaClientes *listaClientes){
+int inicializarListaClientes(ListaClientes *listaClientes){
     NoCliente *novoNo = malloc(sizeof(NoCliente));
 
     if(novoNo == NULL){
-        printf("Erro ao alocar memória.\n");
+        printf("Erro ao alocar memória para Clientes.\n");
         return 0;
     }
 
@@ -275,17 +276,3 @@ NoCliente *buscarClienteNome(ListaClientes *listaClientes, char nome[]){
 
     return NULL;
 };
-
-void listarClientes(ListaClientes *listaClientes){
-
-    NoCliente *atual = listaClientes->primeiro->proximo;
-
-    while(atual != NULL){
-
-        imprimirDadosCliente(&atual->dados);
-
-        printf("\n-------------------------------------\n\n");
-
-        atual = atual->proximo;
-    }
-}

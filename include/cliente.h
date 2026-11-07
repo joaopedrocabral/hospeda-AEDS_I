@@ -18,7 +18,7 @@ typedef struct
     NoCliente *ultimo;
 } ListaClientes;
 
-int inicializarLista(ListaClientes *listaClientes);
+int inicializarListaClientes(ListaClientes *listaClientes);
 
 int inserirCliente(ListaClientes *listaClientes, int *qtdClientes, int idCliente, char nome[], char cpf[], char telefone[]);
 

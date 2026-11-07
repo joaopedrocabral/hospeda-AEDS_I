@@ -1,0 +1,30 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Arquivos temporários
+*.tmp
+*.temp
+*.log
+
+# Dependências
+node_modules/
+
+# Build
+dist/
+build/
+
+# Arquivos de ambiente
+.env
+.env.*
+!.env.example
+
+# Configurações locais de editores
+.vscode/
+.idea/
+
+# Arquivos do sistema
+Thumbs.db
+Desktop.ini
