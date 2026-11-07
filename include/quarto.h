@@ -17,19 +17,12 @@ typedef enum {
 
 typedef struct Quarto {
     int Numero;
-    
     int Andar;
-    
     TipoQuarto Tipo;
-    
     int Capacidade;
-    
     float Diaria;
-    
     StatusQuarto Status;
-    
     struct Quarto *esq;
-    
     struct Quarto *dir;
 }Quarto;
 
