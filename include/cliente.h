@@ -1,3 +1,5 @@
+#ifndef CLIENTE_H
+#define CLIENTE_H
 typedef struct
 {
     int id;
@@ -42,3 +44,5 @@ int validarTelefone(char telefone[]);
 void formatarTelefone(char telefone[], char *telefoneFormatado);
 
 void imprimirDadosCliente(Cliente *cliente);
+#endif
+

@@ -1,6 +1,6 @@
-#include <STDLIB.H>
-#include <STRING.H>
-#include <STDIO.H>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 #include "../include/Espera.h"
 
 void iniciarFila(FilaEspera *fila){
@@ -18,15 +18,15 @@ Espera *criarSolicitacao(int IdSolicitacao,int IdCliente, int NumeroQuarto, char
     nova->IdSolicitacao = IdSolicitacao;
     nova->IdCliente = IdCliente;
     nova->NumeroQuarto = NumeroQuarto;
-    strcpy(nova->DataEntrada = DataEntrada);
-    strcpy(nova->DataSaida = DataSaida);
+    snprintf(nova->DataEntrada, sizeof(nova->DataEntrada), "%s", DataEntrada);
+    snprintf(nova->DataSaida, sizeof(nova->DataSaida), "%s", DataSaida);
 
     nova->prox= NULL;
 
     return nova;
 }
 
-void *enfilerar(FilaEspera *fila, Espera *nova){
+void enfilerar(FilaEspera *fila, Espera *nova){
     
     if (fila->inicio==NULL){
         fila->inicio = nova;
@@ -75,7 +75,7 @@ Espera *buscarSolicitacao(FilaEspera *fila,int IdSolicitacao){
 
 void imprimirSolicitacao(Espera *Solicitacao){
     if (Solicitacao == NULL){
-        return NULL;
+        return;
     }
     printf("ID Solicitação: %d\n",Solicitacao->IdSolicitacao);
     printf("ID Cliente: %d\n",Solicitacao->IdCliente);
