@@ -20,7 +20,7 @@ void iniciarFila(FilaEspera *fila); //inicia a fila
 
 Espera *criarSolicitacao(int IdSolicitacao,int IdCliente, int NumeroQuarto, char DataEntrada[], char DataSaida[]); // cria uma nova solicitação
 
-void *enfilerar(FilaEspera *fila, Espera *nova); //Adiciona no final da fila
+void enfilerar(FilaEspera *fila, Espera *nova); //Adiciona no final da fila
 
 Espera *desenfilerar(FilaEspera *fila); //Remove o primeiro da fila
 
