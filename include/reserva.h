@@ -1,6 +1,9 @@
+#ifndef RESERVA_H
+#define RESERVA_H
+
 #include <time.h>
-#include "../include/cliente.h"
-#include "../include/quarto.h"
+#include "cliente.h"
+#include "quarto.h"
 
 typedef enum {
     AGENDADA,
@@ -36,29 +39,25 @@ typedef struct {
 
 int inicializarListaReservas(ListaReservas *listaReservas);
 
-//Responsável pela criação da reserva e regras de negócio
 int criarReserva(
     ListaReservas *listaReservas,
     ListaClientes *listaClientes,
-    ArvoreQuartos *arvoreQuartos,
-    int codigo,
+    Quarto *arvoreQuartos,
+    int idReserva,
     int idCliente,
     int numeroQuarto,
     char dataCheckIn[],
-    char dataCheckOutPrevista[]
-);
+    char dataCheckOutPrevista[]);
 
-//Responsável pela inserção da reserva na lista de reservas
 int inserirReserva(ListaReservas *listaReservas, Reserva reserva);
 
 NoReserva *buscarReservaId(ListaReservas *listaReservas, int idReserva);
 
+void imprimirDadosReserva(Reserva *reserva, ListaClientes *listaClientes);
 void listarReservas(ListaReservas *listaReservas, ListaClientes *listaClientes);
-
-void listarReservasCliente(ListaReservas *listaReservas, int idCliente);
+void listarReservasCliente(ListaReservas *listaReservas, ListaClientes *listaClientes, int idCliente);
 
 int validarDatasReserva(char dataCheckIn[], char dataCheckOutPrevista[]);
-
 int verificarDisponibilidadeQuarto(
     ListaReservas *listaReservas,
     int numeroQuarto,
@@ -67,14 +66,12 @@ int verificarDisponibilidadeQuarto(
 );
 
 int cancelarReserva(ListaReservas *listaReservas, int idReserva);
-
-int realizarCheckIn(ListaReservas *listaReservas, int idReserva, ArvoreQuartos *arvoreQuartos);
-
+int realizarCheckIn(ListaReservas *listaReservas, int idReserva);
 int realizarCheckOut(
     ListaReservas *listaReservas,
     int idReserva,
     char dataCheckOutEfetiva[],
-    ArvoreQuartos *arvoreQuartos
+    Quarto *arvoreQuartos
 );
 
 float calcularValorReserva(
@@ -82,7 +79,6 @@ float calcularValorReserva(
     char dataCheckIn[],
     char dataCheckOutPrevista[]
 );
-
 float calcularMulta(
     float valorDiaria,
     char dataCheckOutPrevista[],
@@ -91,3 +87,4 @@ float calcularMulta(
 
 int converterData(char data[], time_t *dataConvertida);
 
+#endif

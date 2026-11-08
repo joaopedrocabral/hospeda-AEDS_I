@@ -58,16 +58,3 @@ int obterAndar(int Numero);
 
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
